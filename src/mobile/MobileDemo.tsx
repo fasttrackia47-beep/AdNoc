@@ -5,10 +5,10 @@ import './mobile.css';
 
 type Step = 'map' | 'select' | 'cable' | 'session';
 const STEPS: { id: Step; label: string }[] = [
-  { id: 'map', label: '1 · Карта и станция' },
-  { id: 'select', label: '2 · Выбор устройства' },
-  { id: 'cable', label: '3 · Подключите кабель' },
-  { id: 'session', label: '4 · Зарядка' },
+  { id: 'map', label: '1. Карта и станция' },
+  { id: 'select', label: '2. Выбор устройства' },
+  { id: 'cable', label: '3. Подключите кабель' },
+  { id: 'session', label: '4. Зарядка' },
 ];
 const pad = (n: number) => String(n).padStart(2, '0');
 const hms = (s: number) => `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
@@ -55,7 +55,7 @@ export function MobileDemo() {
           <b>Имитация</b>
           {step === 'cable' && <button onClick={() => setCableOk(true)} disabled={cableOk}>Станция подтвердила кабель</button>}
           {step === 'session' && (offline ? <button onClick={() => setOffline(false)}>Вернуть связь</button> : <button onClick={goOffline}>Пропала связь со станцией</button>)}
-          {step !== 'cable' && step !== 'session' && <span className="secondary">Дальше — шаги «Кабель» и «Зарядка»</span>}
+          {step !== 'cable' && step !== 'session' && <span className="secondary">Дальше шаги «Кабель» и «Зарядка»</span>}
         </div>
       </aside>
       <Phone>
@@ -69,11 +69,21 @@ export function MobileDemo() {
 }
 
 function Phone({ children }: { children: React.ReactNode }) {
+  // На узком экране сжимаем телефон по ширине, чтобы он не обрезался
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const fit = () => setZoom(Math.min(1, window.innerWidth / 440));
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, []);
   return (
+    <div className="phone-wrap" style={{ zoom }}>
     <div className="phone">
       <div className="statusbar"><span>9:41</span><span className="statusbar__island" /><span className="statusbar__icons" aria-hidden><span className="sig"><i /><i /><i /><i /></span><span className="batt"><i /></span></span></div>
       {children}
       <div className="home-ind" />
+    </div>
     </div>
   );
 }
