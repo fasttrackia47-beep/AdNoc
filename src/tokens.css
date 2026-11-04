@@ -1,0 +1,34 @@
+/* Токены 1:1 с переменными Figma: коллекции Spacing, Radius, Brand + цвета веба и iOS. */
+:root {
+  --space-0: 0px; --space-2: 2px; --space-4: 4px; --space-8: 8px; --space-12: 12px;
+  --space-16: 16px; --space-20: 20px; --space-24: 24px; --space-28: 28px; --space-32: 32px;
+  --space-36: 36px; --space-40: 40px; --space-48: 48px; --space-56: 56px; --space-64: 64px;
+
+  --radius-0: 0px; --radius-2: 2px; --radius-4: 4px; --radius-8: 8px; --radius-12: 12px;
+  --radius-16: 16px; --radius-20: 20px; --radius-24: 24px; --radius-28: 28px;
+  --radius-32: 32px; --radius-40: 40px; --radius-full: 999px;
+
+  --brand-lime: #C7F464;
+
+  /* Веб-админка (кастомный стиль AdNoc) */
+  --ink: #0B1310; --ink-2: #1B2620; --muted: #5C6B7E; --muted-2: #66756D; --faint: #9AA59F;
+  --line: #EDF0EB; --line-2: #E1E6DF; --bg: #F4F6F2; --surface: #FFFFFF;
+  --side-text: #A9B5AE; --side-line: #26332D; --side-bar: #2A3630; --side-fg: #F2F5F1; --side-muted: #8C9A92;
+  --dot-green: #5BB318; --dot-blue: #2F6BFF; --dot-orange: #F29900; --dot-red: #E5483D;
+  --free-bg: #EAF8D1; --free-fg: #2D5A0B; --work-bg: #E4EEFF; --work-fg: #1A47B8;
+  --warn-bg: #FFF0D6; --warn-fg: #8A4B00; --danger: #D92D20; --danger-bg: #FDECEA;
+  --tag-ac: #E9EDE7; --tag-dc: #DCE6EF; --btn-bg: #F2F4F1;
+
+  /* Мобилка: цвета библиотеки iOS and iPadOS */
+  --ios-green: #34C759; --ios-red: #FF3B30; --ios-orange: #FF9500;
+  --label: #000000; --label-2: rgba(60, 60, 67, 0.6); --label-3: rgba(60, 60, 67, 0.3);
+  --fill-2: rgba(120, 120, 128, 0.16); --fill-3: rgba(118, 118, 128, 0.12); --fill-4: rgba(116, 116, 128, 0.08);
+  --bg-secondary: #F2F2F7; --gray-4: #D1D1D6;
+
+  --font: Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; min-height: 100%; }
+body { font-family: var(--font); color: var(--ink); background: var(--surface); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
+button:disabled { cursor: default; }

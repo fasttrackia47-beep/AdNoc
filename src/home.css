@@ -1,0 +1,10 @@
+.home { max-width: 720px; margin: 0 auto; padding: var(--space-64) var(--space-24); }
+.home h1 { font-size: 40px; line-height: 48px; margin: 0 0 var(--space-12); }
+.home p { font-size: 17px; line-height: 24px; color: var(--muted); margin: 0 0 var(--space-32); }
+.home__cards { display: grid; gap: var(--space-12); margin-bottom: var(--space-32); }
+.home__cards a { display: grid; gap: var(--space-4); padding: var(--space-20) var(--space-24); border-radius: var(--radius-24); background: var(--bg); color: var(--ink); text-decoration: none; }
+.home__cards a:hover { background: var(--brand-lime); }
+.home__cards b { font-size: 20px; line-height: 28px; }
+.home__cards span { font-size: 15px; line-height: 20px; color: var(--muted); }
+.home__cards a:hover span { color: var(--ink); }
+.home small { color: var(--faint); font-size: 13px; line-height: 18px; }
