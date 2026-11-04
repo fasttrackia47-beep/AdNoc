@@ -4,6 +4,21 @@ import { IconClose, IconLock } from '../icons';
 import { BackLink, ColumnHeader, ConfirmDialog, Fact, FilterChip, Pagination, SearchField, Sidebar, StatusBadge, TypeTag } from './parts';
 import './web.css';
 
+type SortKey = 'name' | 'type' | 'connectors' | 'status' | 'session' | 'power';
+type Sort = { key: SortKey; dir: 'asc' | 'desc' } | null;
+const LABELS: [SortKey, string][] = [['name', 'Устройство'], ['type', 'Тип'], ['connectors', 'Разъёмы'], ['status', 'Статус'], ['session', 'Сессия'], ['power', 'Мощность']];
+// Значение для сортировки: пустые («—») всегда в конце
+const sortValue = (d: Device, k: SortKey): string | number | null => {
+  switch (k) {
+    case 'name': return d.name;
+    case 'type': return `${d.type} ${d.plug}`;
+    case 'connectors': return d.connectors;
+    case 'status': return d.status;
+    case 'session': return d.session ?? null;
+    case 'power': return d.power ? parseFloat(d.power) : null;
+  }
+};
+
 type Filter = 'Все' | DeviceStatus;
 const FILTERS: Filter[] = ['Все', 'Свободно', 'Работает', 'Нет связи', 'Неисправно'];
 const count = (f: Filter) => (f === 'Все' ? COUNTERS.all : COUNTERS[f]);
@@ -14,7 +29,9 @@ export function WebApp() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>('Все');
   const [query, setQuery] = useState('');
-  const [sortAsc, setSortAsc] = useState<boolean | null>(null);
+  const [sort, setSort] = useState<Sort>(null);
+  // Клик по столбцу: по возрастанию, затем по убыванию, затем сброс
+  const toggleSort = (key: SortKey) => { setSort((s) => (!s || s.key !== key ? { key, dir: 'asc' } : s.dir === 'asc' ? { key, dir: 'desc' } : null)); setPage(1); };
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   // Состояние разъёмов хранится по устройству: завершённые сессии и блокировки.
@@ -26,9 +43,19 @@ export function WebApp() {
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
     let r = DEVICES.filter((d) => (filter === 'Все' || d.status === filter) && (!q || `${d.name} ${d.id} ${d.station}`.toLowerCase().includes(q)));
-    if (sortAsc !== null) r = [...r].sort((a, b) => a.name.localeCompare(b.name, 'ru', { numeric: true }) * (sortAsc ? 1 : -1));
+    if (sort) {
+      const m = sort.dir === 'asc' ? 1 : -1;
+      r = [...r].sort((a, b) => {
+        const x = sortValue(a, sort.key), y = sortValue(b, sort.key);
+        if (x === null && y === null) return 0;
+        if (x === null) return 1;
+        if (y === null) return -1;
+        const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'ru', { numeric: true });
+        return c * m;
+      });
+    }
     return r;
-  }, [filter, query, sortAsc]);
+  }, [filter, query, sort]);
 
   const pageRows = rows.slice((page - 1) * perPage, page * perPage);
   // Пагинация нужна, только если записей больше, чем помещается на одну страницу
@@ -66,8 +93,7 @@ export function WebApp() {
             </div>
             <section className="table" aria-label="Список устройств">
               <div className="row row--devices row--head">
-                <ColumnHeader sort={sortAsc === null ? undefined : sortAsc ? 'asc' : 'desc'} onSort={() => setSortAsc((s) => (s === null ? true : !s))}>Устройство</ColumnHeader>
-                <div>Тип</div><div>Разъёмы</div><div>Статус</div><div>Сессия</div><div>Мощность</div>
+                {LABELS.map(([k, l]) => <ColumnHeader key={k} sort={sort?.key === k ? sort.dir : undefined} onSort={() => toggleSort(k)}>{l}</ColumnHeader>)}
               </div>
               {rows.length === 0 && <div className="empty">Ничего не найдено. Сбросьте фильтр или измените запрос.</div>}
               {pageRows.map((d) => <DeviceRow key={d.id} d={d} onOpen={() => setOpenId(d.id)} />)}

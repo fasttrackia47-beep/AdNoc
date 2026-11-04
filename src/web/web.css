@@ -50,7 +50,11 @@
 .row--connectors.row--body { min-height: 68px; padding-top: var(--space-12); padding-bottom: var(--space-12); }
 .cell-sub { color: var(--muted); font-size: 13px; line-height: 18px; }
 .dash { color: var(--faint); }
-.th button { display: inline-flex; align-items: center; gap: var(--space-4); }
+.th button { display: inline-flex; align-items: center; gap: var(--space-4); margin-left: calc(-1 * var(--space-8)); padding: 0 var(--space-8); height: 32px; border-radius: var(--radius-full); color: inherit; }
+.th button:hover { background: var(--bg); color: var(--ink); }
+.th__sort { opacity: 0; }
+.th--active { color: var(--ink); }
+.th--active .th__sort { opacity: 1; }
 .pager { display: flex; align-items: center; justify-content: space-between; height: 76px; padding: 0 var(--space-28); color: var(--muted); }
 .pager__left { display: flex; align-items: center; gap: var(--space-16); }
 .select { position: relative; display: inline-flex; align-items: center; height: 36px; background: var(--bg); border-radius: var(--radius-full); color: var(--ink); }
@@ -78,7 +82,9 @@
 .status--error { background: var(--danger-bg); color: var(--danger); } .status--error i { background: var(--dot-red); }
 
 /* Device card */
-.back { display: inline-flex; align-items: center; gap: var(--space-8); font-size: 13px; line-height: 18px; align-self: flex-start; }
+.back { display: inline-flex; align-items: center; gap: var(--space-8); font-size: 13px; line-height: 18px; align-self: flex-start; height: 36px; padding: 0 var(--space-12) 0 var(--space-8); margin-left: calc(-1 * var(--space-8)); border-radius: var(--radius-full); transition: background .12s; }
+.back:hover { background: var(--btn-bg-hover); }
+.back:focus-visible { outline: 2px solid var(--dot-blue); outline-offset: 2px; }
 .back svg { width: 16px; height: 16px; }
 .title-row { display: flex; align-items: center; gap: var(--space-16); }
 .facts { display: grid; grid-auto-flow: column; grid-template-columns: 1fr repeat(3, auto); background: var(--surface); border-radius: var(--radius-24); padding: var(--space-12) var(--space-0); }

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { IconBack, IconChevronDown, IconClose, IconChevronLeft, IconChevronRight, IconDevices, IconLog, IconSearch, IconSessions, IconSort, IconStations } from '../icons';
+import { IconBack, IconChevronDown, IconClose, IconChevronLeft, IconChevronRight, IconDevices, IconLog, IconSearch, IconSessions, IconStations } from '../icons';
 import type { ConnectorStatus, DeviceStatus, PowerType } from '../data';
 
 export function Logo() {
@@ -70,8 +70,17 @@ export function StatusBadge({ status }: { status: DeviceStatus | ConnectorStatus
 
 export function ColumnHeader({ children, sort, onSort }: { children: ReactNode; sort?: 'asc' | 'desc'; onSort?: () => void }) {
   return (
-    <div className="th">
-      {onSort ? <button onClick={onSort} aria-label={`Сортировать: ${children}`}>{children}<IconSort width={14} height={14} style={{ opacity: sort ? 1 : 0.6 }} /></button> : children}
+    <div className="th" aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : undefined}>
+      {onSort ? (
+        <button onClick={onSort} className={sort ? 'th--active' : undefined} aria-label={`Сортировать: ${children}`}>
+          {children}
+          {/* Иконка видна у выбранного столбца: подсвечена стрелка текущего направления */}
+          <svg className="th__sort" width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m8 9 4-4 4 4" style={{ opacity: sort === 'desc' ? 0.35 : 1 }} />
+            <path d="M8 15l4 4 4-4" style={{ opacity: sort === 'asc' ? 0.35 : 1 }} />
+          </svg>
+        </button>
+      ) : children}
     </div>
   );
 }
