@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { IconBack, IconChevronDown, IconChevronLeft, IconChevronRight, IconDevices, IconLog, IconSearch, IconSessions, IconSort, IconStations } from '../icons';
+import { IconBack, IconChevronDown, IconClose, IconChevronLeft, IconChevronRight, IconDevices, IconLog, IconSearch, IconSessions, IconSort, IconStations } from '../icons';
 import type { ConnectorStatus, DeviceStatus, PowerType } from '../data';
 
 export function Logo() {
@@ -42,6 +42,7 @@ export function SearchField({ value, onChange }: { value: string; onChange: (v: 
     <label className="search">
       <IconSearch width={18} height={18} />
       <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="Поиск по названию или ID" aria-label="Поиск по названию или ID" />
+      {value && <button type="button" className="search__clear" aria-label="Очистить поиск" onClick={(e) => { e.preventDefault(); onChange(''); }}><IconClose width={16} height={16} /></button>}
     </label>
   );
 }
@@ -75,21 +76,39 @@ export function ColumnHeader({ children, sort, onSort }: { children: ReactNode; 
   );
 }
 
-export function Pagination({ page, onPage, total, perPage, shown }: { page: number; onPage: (p: number) => void; total: number; perPage: number; shown: number }) {
-  const pages = [1, 2, 3, '…', 13] as const;
+export const PAGE_SIZES = [10, 20, 50] as const;
+
+// 1, 2, 3, …, последняя: показываем первую, последнюю и соседние с текущей
+function pageList(page: number, last: number): (number | '…')[] {
+  const set = new Set([1, 2, last, page - 1, page, page + 1].filter((p) => p >= 1 && p <= last));
+  const sorted = [...set].sort((a, b) => a - b);
+  const out: (number | '…')[] = [];
+  sorted.forEach((p, i) => { if (i && p - sorted[i - 1] > 1) out.push('…'); out.push(p); });
+  return out;
+}
+
+export function Pagination({ page, onPage, total, perPage, onPerPage }: { page: number; onPage: (p: number) => void; total: number; perPage: number; onPerPage: (n: number) => void }) {
+  const last = Math.max(1, Math.ceil(total / perPage));
+  const from = (page - 1) * perPage + 1;
+  const to = Math.min(total, page * perPage);
   return (
     <div className="pager">
       <div className="pager__left">
-        <span>Показывать по</span>
-        <span className="select">{perPage}<IconChevronDown width={16} height={16} /></span>
-        <span>1–{shown} из {total}</span>
+        <label htmlFor="per-page">Показывать по</label>
+        <span className="select">
+          <select id="per-page" value={perPage} onChange={(e) => onPerPage(Number(e.target.value))}>
+            {PAGE_SIZES.map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+          <IconChevronDown width={16} height={16} />
+        </span>
+        <span>{from}–{to} из {total}</span>
       </div>
       <div className="pager__pages">
         <button className="page page--arrow" disabled={page === 1} aria-label="Назад" onClick={() => onPage(page - 1)}><IconChevronLeft width={16} height={16} /></button>
-        {pages.map((p, i) => typeof p === 'number'
+        {pageList(page, last).map((p, i) => typeof p === 'number'
           ? <button key={i} className="page" aria-current={p === page ? 'page' : undefined} onClick={() => onPage(p)}>{p}</button>
           : <span key={i} className="page" style={{ color: 'var(--muted)' }}>{p}</span>)}
-        <button className="page page--arrow" aria-label="Вперёд" onClick={() => onPage(page + 1)}><IconChevronRight width={16} height={16} /></button>
+        <button className="page page--arrow" disabled={page === last} aria-label="Вперёд" onClick={() => onPage(page + 1)}><IconChevronRight width={16} height={16} /></button>
       </div>
     </div>
   );

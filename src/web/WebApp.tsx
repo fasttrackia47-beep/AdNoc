@@ -16,6 +16,7 @@ export function WebApp() {
   const [query, setQuery] = useState('');
   const [sortAsc, setSortAsc] = useState<boolean | null>(null);
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   // Состояние разъёмов хранится по устройству: завершённые сессии и блокировки.
   const [ended, setEnded] = useState<Record<string, number[]>>({});
   const [blocked, setBlocked] = useState<Record<string, number[]>>({});
@@ -28,6 +29,10 @@ export function WebApp() {
     if (sortAsc !== null) r = [...r].sort((a, b) => a.name.localeCompare(b.name, 'ru', { numeric: true }) * (sortAsc ? 1 : -1));
     return r;
   }, [filter, query, sortAsc]);
+
+  const pageRows = rows.slice((page - 1) * perPage, page * perPage);
+  // Пагинация нужна, только если записей больше, чем помещается на одну страницу
+  const showPager = rows.length > 10;
 
   const device = DEVICES.find((d) => d.id === openId) ?? null;
 
@@ -65,10 +70,10 @@ export function WebApp() {
                 <div>Тип</div><div>Разъёмы</div><div>Статус</div><div>Сессия</div><div>Мощность</div>
               </div>
               {rows.length === 0 && <div className="empty">Ничего не найдено. Сбросьте фильтр или измените запрос.</div>}
-              {rows.map((d) => <DeviceRow key={d.id} d={d} onOpen={() => setOpenId(d.id)} />)}
-              <Pagination page={page} onPage={(p) => setPage(Math.min(13, Math.max(1, p)))} total={COUNTERS.all} perPage={10} shown={Math.min(10, rows.length)} />
+              {pageRows.map((d) => <DeviceRow key={d.id} d={d} onOpen={() => setOpenId(d.id)} />)}
+              {showPager && <Pagination page={page} onPage={setPage} total={rows.length} perPage={perPage} onPerPage={(n) => { setPerPage(n); setPage(1); }} />}
             </section>
-            <small style={{ color: 'var(--muted)' }}>Прототип: данные условные, показана только первая страница из 13.</small>
+            <small style={{ color: 'var(--muted)' }}>Прототип: данные условные.</small>
           </>
         )}
       </main>
@@ -106,13 +111,12 @@ function DeviceCard({ device, ended, blocked, onBack, onAction }: { device: Devi
   return (
     <>
       <BackLink onClick={onBack} />
-      <div className="title-row"><h1 className="title">{device.name}</h1><StatusBadge status={status} /></div>
+      <div className="title-row"><h1 className="title title--inner">{device.name}</h1><StatusBadge status={status} /></div>
       <div className="facts">
         <Fact label="Станция">№{device.station.replace(/\D/g, '')}, ул. Невская, 12</Fact>
-        <Fact label="ID устройства">{device.id}</Fact>
-        <Fact label="Тип">{device.type} · {device.plug}</Fact>
+        <Fact label="ID">{device.id}</Fact>
         <Fact label="Разъёмы">{device.connectors}</Fact>
-        <Fact label="Мощность сейчас, кВт">{String(kw).replace('.', ',')} <small>из {device.maxKw}</small></Fact>
+        <Fact label="Мощность, кВт">{String(kw).replace('.', ',')} <small>из {device.maxKw}</small></Fact>
       </div>
       <section className="table" aria-label="Разъёмы">
         <div className="row row--connectors row--head">

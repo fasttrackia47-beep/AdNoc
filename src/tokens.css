@@ -17,7 +17,7 @@
   --dot-green: #5BB318; --dot-blue: #2F6BFF; --dot-orange: #F29900; --dot-red: #E5483D;
   --free-bg: #EAF8D1; --free-fg: #2D5A0B; --work-bg: #E4EEFF; --work-fg: #1A47B8;
   --warn-bg: #FFF0D6; --warn-fg: #8A4B00; --danger: #D92D20; --danger-bg: #FDECEA;
-  --tag-ac: #E9EDE7; --tag-dc: #DCE6EF; --btn-bg: #F2F4F1;
+  --tag-ac: #E9EDE7; --tag-dc: #DCE6EF; --btn-bg: #F2F4F1; --btn-bg-hover: #E6EAE3; --danger-bg-hover: #FADBD7; --row-hover: #F1F4EE;
 
   /* Мобилка: цвета библиотеки iOS and iPadOS */
   --ios-green: #34C759; --ios-red: #FF3B30; --ios-orange: #FF9500;

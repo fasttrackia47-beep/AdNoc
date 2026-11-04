@@ -46,7 +46,14 @@ export const DEVICES: Device[] = [
   d(10, 147, 'AC', 4, 'Свободно'),
 ];
 
-export const COUNTERS = { all: 123, 'Свободно': 120, 'Работает': 2, 'Нет связи': 1, 'Неисправно': 0 } as const;
+// Остальные устройства до 123: условные данные, чтобы работала пагинация (по три устройства на станцию).
+for (let n = 11; n <= 123; n++) {
+  const type: PowerType = n % 4 === 0 ? 'DC' : 'AC';
+  DEVICES.push(d(n, 144 + Math.floor((n - 1) / 3), type, type === 'DC' ? 1 : n % 5 === 0 ? 3 : 4, 'Свободно'));
+}
+
+const countBy = (s: DeviceStatus) => DEVICES.filter((x) => x.status === s).length;
+export const COUNTERS = { all: DEVICES.length, 'Свободно': countBy('Свободно'), 'Работает': countBy('Работает'), 'Нет связи': countBy('Нет связи'), 'Неисправно': countBy('Неисправно') } as const;
 
 export function connectorsOf(dev: Device): Connector[] {
   const list: Connector[] = Array.from({ length: dev.connectors }, (_, i) => ({ id: i + 1, status: 'Свободен' as const }));
