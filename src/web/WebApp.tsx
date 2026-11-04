@@ -29,9 +29,9 @@ export function WebApp() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>('Все');
   const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<Sort>(null);
-  // Клик по столбцу: по возрастанию, затем по убыванию, затем сброс
-  const toggleSort = (key: SortKey) => { setSort((s) => (!s || s.key !== key ? { key, dir: 'asc' } : s.dir === 'asc' ? { key, dir: 'desc' } : null)); setPage(1); };
+  const [sort, setSort] = useState<Sort>({ key: 'name', dir: 'asc' });
+  // Клик по столбцу: сначала по возрастанию, повторный клик меняет направление
+  const toggleSort = (key: SortKey) => { setSort((s) => (!s || s.key !== key ? { key, dir: 'asc' } : { key, dir: s.dir === 'asc' ? 'desc' : 'asc' })); setPage(1); };
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   // Состояние разъёмов хранится по устройству: завершённые сессии и блокировки.
@@ -80,6 +80,7 @@ export function WebApp() {
     <div className="web">
       <Sidebar onNavigate={(id) => { if (id === 'devices') setOpenId(null); }} />
       <main className="content">
+        <div className="view" key={device ? `d${device.id}` : 'list'}>
         {device ? (
           <DeviceCard device={device} ended={ended[device.id] ?? []} blocked={blocked[device.id] ?? []} onBack={() => setOpenId(null)} onAction={(kind, connector) => setPending({ kind, connector })} />
         ) : (
@@ -102,6 +103,7 @@ export function WebApp() {
             <small style={{ color: 'var(--muted)' }}>Прототип: данные условные.</small>
           </>
         )}
+        </div>
       </main>
       {pending && device && (
         <ConfirmDialog

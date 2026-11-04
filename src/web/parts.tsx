@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { IconBack, IconChevronDown, IconClose, IconChevronLeft, IconChevronRight, IconDevices, IconLog, IconSearch, IconSessions, IconStations } from '../icons';
 import type { ConnectorStatus, DeviceStatus, PowerType } from '../data';
 
@@ -72,12 +72,12 @@ export function ColumnHeader({ children, sort, onSort }: { children: ReactNode; 
   return (
     <div className="th" aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : undefined}>
       {onSort ? (
-        <button onClick={onSort} className={sort ? 'th--active' : undefined} aria-label={`Сортировать: ${children}`}>
+        <button onClick={onSort} className={sort ? 'th--active' : undefined} data-dir={sort} aria-label={`Сортировать: ${children}`}>
           {children}
-          {/* Иконка видна у выбранного столбца: подсвечена стрелка текущего направления */}
+          {/* Серые стрелки появляются при наведении; у выбранного столбца видна всегда, активная стрелка тёмная */}
           <svg className="th__sort" width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="m8 9 4-4 4 4" style={{ opacity: sort === 'desc' ? 0.35 : 1 }} />
-            <path d="M8 15l4 4 4-4" style={{ opacity: sort === 'asc' ? 0.35 : 1 }} />
+            <path className="up" d="m8 9 4-4 4 4" />
+            <path className="down" d="M8 15l4 4 4-4" />
           </svg>
         </button>
       ) : children}
@@ -96,6 +96,60 @@ function pageList(page: number, last: number): (number | '…')[] {
   return out;
 }
 
+function PageSizeSelect({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ left: 0, bottom: 0 });
+  const btn = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLUListElement>(null);
+
+  const toggle = () => {
+    if (!open && btn.current) {
+      const r = btn.current.getBoundingClientRect();
+      setPos({ left: r.left, bottom: window.innerHeight - r.top + 8 }); // меню открывается вверх над кнопкой
+    }
+    setOpen((o) => !o);
+  };
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: Event) => { if (!menu.current?.contains(e.target as Node) && !btn.current?.contains(e.target as Node)) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') { setOpen(false); btn.current?.focus(); } };
+    const off = () => setOpen(false);
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', esc);
+    window.addEventListener('resize', off);
+    window.addEventListener('scroll', off, true);
+    menu.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus();
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc); window.removeEventListener('resize', off); window.removeEventListener('scroll', off, true); };
+  }, [open]);
+
+  const onKey = (e: React.KeyboardEvent<HTMLUListElement>) => {
+    const items = [...(menu.current?.querySelectorAll<HTMLElement>('[role="option"]') ?? [])];
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(items.length - 1, i + 1)]?.focus(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(0, i - 1)]?.focus(); }
+  };
+
+  return (
+    <>
+      <button ref={btn} type="button" className="select" aria-haspopup="listbox" aria-expanded={open} aria-label="Сколько строк показывать" onClick={toggle}>
+        {value}<IconChevronDown width={16} height={16} className={open ? 'select__chev select__chev--open' : 'select__chev'} />
+      </button>
+      {open && (
+        <ul ref={menu} className="menu" role="listbox" style={{ left: pos.left, bottom: pos.bottom }} onKeyDown={onKey}>
+          {PAGE_SIZES.map((n) => (
+            <li key={n} role="option" tabIndex={0} aria-selected={n === value} className="menu__item"
+              onClick={() => { onChange(n); setOpen(false); btn.current?.focus(); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(n); setOpen(false); btn.current?.focus(); } }}>
+              {n}
+              {n === value && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
 export function Pagination({ page, onPage, total, perPage, onPerPage }: { page: number; onPage: (p: number) => void; total: number; perPage: number; onPerPage: (n: number) => void }) {
   const last = Math.max(1, Math.ceil(total / perPage));
   const from = (page - 1) * perPage + 1;
@@ -103,13 +157,8 @@ export function Pagination({ page, onPage, total, perPage, onPerPage }: { page: 
   return (
     <div className="pager">
       <div className="pager__left">
-        <label htmlFor="per-page">Показывать по</label>
-        <span className="select">
-          <select id="per-page" value={perPage} onChange={(e) => onPerPage(Number(e.target.value))}>
-            {PAGE_SIZES.map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-          <IconChevronDown width={16} height={16} />
-        </span>
+        <span>Показывать по</span>
+        <PageSizeSelect value={perPage} onChange={onPerPage} />
         <span>{from}–{to} из {total}</span>
       </div>
       <div className="pager__pages">
