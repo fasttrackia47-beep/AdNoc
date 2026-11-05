@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { IconBack, IconChevronDown, IconClose, IconChevronLeft, IconChevronRight, IconDevices, IconLog, IconSearch, IconSessions, IconStations } from '../icons';
+import { CITY } from '../data';
 import type { ConnectorStatus, DeviceStatus, PowerType } from '../data';
 
 export function Logo() {
@@ -22,6 +23,10 @@ export function Sidebar({ active = 'devices', onNavigate }: { active?: string; o
   return (
     <aside className="sidebar">
       <Logo />
+      <button type="button" className="city" aria-label={`Город: ${CITY}`}>
+        <span className="city__text"><span className="city__label">Город</span><span className="city__value">{CITY}</span></span>
+        <IconChevronDown width={20} height={20} />
+      </button>
       <nav className="nav" aria-label="Разделы">
         {NAV.map((n) => (
           <button key={n.id} className="nav__item" aria-current={n.id === active ? 'page' : undefined} onClick={() => onNavigate?.(n.id)}>

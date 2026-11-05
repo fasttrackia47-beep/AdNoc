@@ -66,7 +66,8 @@ export function connectorsOf(dev: Device): Connector[] {
 }
 
 // Приложение водителя: станция №144, три устройства.
-export const STATION = { name: 'Станция №144', address: 'ул. Невская, 12', distance: '400 м', card: '•• 4242' };
+export const CITY = 'Санкт-Петербург';
+export const STATION = { name: 'Станция №144', address: `${CITY}, ул. Невская, 12`, distance: '400 м', card: '•• 4242' };
 export const TARIFF = { AC: 14, DC: 28 } as const; // ₽/кВт·ч, условно
 
 export interface DriverDevice {

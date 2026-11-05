@@ -8,6 +8,12 @@
 .logo__bars i { width: 6px; border-radius: var(--radius-2); background: var(--brand-lime); }
 .logo__bars i:nth-child(1) { height: 8px; } .logo__bars i:nth-child(2) { height: 12px; } .logo__bars i:nth-child(3) { height: 16px; }
 .logo__bars i:nth-child(4), .logo__bars i:nth-child(5) { background: var(--side-bar); height: 24px; }
+.city { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); width: 100%; margin-bottom: var(--space-16); padding: var(--space-12) var(--space-16); border: 1px solid var(--side-line); border-radius: var(--radius-12); color: var(--side-text); text-align: left; }
+.city:hover { background: var(--ink-2); }
+.city:focus-visible { outline: 2px solid var(--dot-blue); outline-offset: 2px; }
+.city__text { display: grid; }
+.city__label { font-size: 13px; line-height: 18px; color: var(--side-text); }
+.city__value { font-size: 15px; line-height: 20px; font-weight: 500; color: var(--side-fg); }
 .nav { display: grid; gap: var(--space-4); }
 .nav__item { display: flex; align-items: center; gap: var(--space-12); height: 44px; padding: 0 var(--space-16); border-radius: var(--radius-16); color: var(--side-text); font-size: 15px; text-align: left; }
 .nav__item:hover { background: var(--ink-2); }

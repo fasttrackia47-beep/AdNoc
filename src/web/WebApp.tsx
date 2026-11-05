@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { COUNTERS, DEVICES, connectorsOf, type Connector, type Device, type DeviceStatus } from '../data';
+import { CITY, COUNTERS, DEVICES, connectorsOf, type Connector, type Device, type DeviceStatus } from '../data';
 import { IconClose, IconLock } from '../icons';
 import { BackLink, ColumnHeader, ConfirmDialog, Fact, FilterChip, Pagination, SearchField, Sidebar, StatusBadge, TypeTag } from './parts';
 import './web.css';
@@ -121,7 +121,7 @@ export function WebApp() {
 function DeviceRow({ d, onOpen }: { d: Device; onOpen: () => void }) {
   return (
     <div className="row row--devices row--body" onClick={onOpen} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') onOpen(); }}>
-      <div><div>{d.name}</div><div className="cell-sub">Станция №{d.station.replace(/\D/g, '')} · ID {d.id}</div></div>
+      <div><div>{d.name}</div><div className="cell-sub">{CITY} · Станция №{d.station.replace(/\D/g, '')} · ID {d.id}</div></div>
       <div className="tag-cell"><TypeTag type={d.type} /><span>{d.plug}</span></div>
       <div>{d.connectors}</div>
       <div><StatusBadge status={d.status} /></div>
@@ -141,7 +141,7 @@ function DeviceCard({ device, ended, blocked, onBack, onAction }: { device: Devi
       <BackLink onClick={onBack} />
       <div className="title-row"><h1 className="title title--inner">{device.name}</h1><StatusBadge status={status} /></div>
       <div className="facts">
-        <Fact label="Станция">№{device.station.replace(/\D/g, '')}, ул. Невская, 12</Fact>
+        <Fact label="Станция">№{device.station.replace(/\D/g, '')}, {CITY}, ул. Невская, 12</Fact>
         <Fact label="ID">{device.id}</Fact>
         <Fact label="Разъёмы">{device.connectors}</Fact>
         <Fact label="Мощность, кВт">{String(kw).replace('.', ',')} <small>из {device.maxKw}</small></Fact>
